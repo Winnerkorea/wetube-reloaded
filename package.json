@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The best way to watch videos.",
   "scripts": {
-    "win": "node index.js"
+    "dev": "nodemon --exec babel-node src/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   "devDependencies": {
     "@babel/cli": "^7.17.10",
     "@babel/core": "^7.18.5",
+    "@babel/node": "^7.18.5",
     "@babel/preset-env": "^7.18.2"
   }
 }
