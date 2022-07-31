@@ -1,21 +1,18 @@
 import express from "express";
-const PORT = 4000;
+import morgan from "morgan";
+import globalRouter from "./routers/globalRouter";
+import videoRouter from "./routers/videoRouter";
+import userRouter from "./routers/userRouter";
 
 const app = express();
+const logger = morgan("dev");
 
-const goddipMiddleware(reg, res, next) =>{
-    console.log("I'm in the middle")
+app.set("view engine", "pug");
+app.set("views", process.cwd() + "/src/views");
+app.use(logger);
+app.use(express.urlencoded({ extended: true }));
+app.use("/", globalRouter);
+app.use("/videos", videoRouter);
+app.use("/users", userRouter);
 
-}
-
-const handleHome = (req, res) => {
-  return res.send("I still love you.");
-};
-const handleLogin = (req, res) => {
-  return res.send("Login here.");
-};
-app.get("/", handleHome);
-app.get("/login", handleLogin);
-
-const handleListening = () => console.log(`✅ Server listenting on port http://localhost:${PORT} 🚀`);
-app.listen(PORT, handleListening);
+export default app;
