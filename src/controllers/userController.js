@@ -1,5 +1,5 @@
 import User from "../models/User";
-import bcrypt from "bcrypt"
+import bcrypt from "bcrypt";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -53,9 +53,11 @@ export const postLogin = async (req, res) => {
       errorMessage: "Wrong password",
     });
   }
-  // check if password correct
-  console.log("Log User In! Coming Soon!")
-return res.redirect("/")
+
+  req.session.loggedIn = true;
+  req.session.user = user;
+
+  return res.redirect("/");
 };
 
 export const edit = (req, res) => res.send("Edit User");
