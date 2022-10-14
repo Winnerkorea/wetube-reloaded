@@ -142,10 +142,24 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl, email: sessionUserEmail, name: sessionUserName },
     },
     body: { name, email, username, location },
   } = req;
+
+  let searchParam = [];
+
+  if (sessionUserEmail !== email) {
+    searchParam.push({ email });
+  }
+  if (!sessionUserName !== username) {
+    searchParam.push({ username });
+  }
+
+  // _id 값을 찾는다. 자신을 제외하고 중복을 찾는다.
+  // 찾은 값중에 username이 있는지 확인한다.
+  // 찾는 값중에 eMail을 찾는다.
+  // 이상여부 확인.
 
   const updateUse = await User.findByIdAndUpdate(
     _id,
