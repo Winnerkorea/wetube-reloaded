@@ -1,6 +1,8 @@
 import User from "../models/User";
 import fetch from "node-fetch";
 import bcrypt from "bcrypt";
+import session from "express-session";
+import { search } from "./videoController";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -142,24 +144,30 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
   const {
     session: {
-      user: { _id, avatarUrl, email: sessionUserEmail, name: sessionUserName },
+      user: { _id },
     },
     body: { name, email, username, location },
+    file,
   } = req;
 
-  let searchParam = [];
+  console.log(file);
 
-  if (sessionUserEmail !== email) {
-    searchParam.push({ email });
+  if (username !== req.session.user.username) {
+    const existingUsername = await User.exists({ username });
+    if (existingUsername) {
+      return res.status(400).render("edit-profile", {
+        errorMessage: "This username is already taken.",
+      });
+    }
   }
-  if (!sessionUserName !== username) {
-    searchParam.push({ username });
+  if (email !== req.session.user.email) {
+    const existingEmail = await User.exists({ email });
+    if (existingEmail) {
+      return res.status(400).render("edit-profile", {
+        errorMessage: "This email is already taken.",
+      });
+    }
   }
-
-  // _id 값을 찾는다. 자신을 제외하고 중복을 찾는다.
-  // 찾은 값중에 username이 있는지 확인한다.
-  // 찾는 값중에 eMail을 찾는다.
-  // 이상여부 확인.
 
   const updateUse = await User.findByIdAndUpdate(
     _id,
@@ -174,4 +182,43 @@ export const postEdit = async (req, res) => {
   req.session.user = updateUse;
   return res.redirect("/users/edit");
 };
+
+export const getChangePassword = (req, res) => {
+  if (req.session.user.socialOnly) {
+    return res.redirect("/");
+  }
+  return res.render("users/change-password", { pageTitle: "Change Password" });
+};
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id, password },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+
+  const user = await User.findById(_id);
+  const ok = await bcrypt.compare(oldPassword, user.password);
+
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "change Password",
+      errorMessage: "The current password is incorrect",
+    });
+  }
+
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "change Password",
+      errorMessage: "The password dose not match the confirmation",
+    });
+  }
+
+  user.password = newPassword;
+
+  await user.save();
+
+  return res.redirect("/users/logout");
+};
+
 export const see = (req, res) => res.send("See User");
