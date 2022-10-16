@@ -3,6 +3,8 @@ import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 import session from "express-session";
 import { search } from "./videoController";
+import { render } from "pug";
+import Video from "../models/Video";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -115,6 +117,7 @@ export const finishGithubLogin = async (req, res) => {
       return res.redirect("/login");
     }
     let user = await User.findOne({ email: emailObj.email });
+
     if (!user) {
       user = await User.create({
         avatarUrl: userData.avatar_url,
@@ -126,6 +129,7 @@ export const finishGithubLogin = async (req, res) => {
         location: userData.location,
       });
     }
+
     req.session.loggedIn = true;
     req.session.user = user;
     return res.redirect("/");
@@ -222,4 +226,15 @@ export const postChangePassword = async (req, res) => {
   return res.redirect("/users/logout");
 };
 
-export const see = (req, res) => res.send("See User");
+export const see = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found" });
+  }
+
+  return res.render("users/profile", {
+    pageTitle: user.name,
+    user,
+  });
+};
