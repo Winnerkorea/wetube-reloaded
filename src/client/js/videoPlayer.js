@@ -1,12 +1,29 @@
 const video = document.querySelector("video");
-const play = document.querySelector("play");
-const mute = document.querySelector("mute");
-const time = document.querySelector("time");
-const range = document.querySelector("range");
+const playBtn = document.getElementById("play");
+const muteBtn = document.getElementById("mute");
+const time = document.getElementById("time");
+const volume = document.getElementById("volume");
 
-const handleplay = (e) => {};
+const handlePlayClick = (e) => {
+  if (video.paused) {
+    video.play();
+  } else {
+    video.pause();
+  }
+};
+const handlePause = () => (playBtn.innerText = "Play");
+const handlePlay = () => (playBtn.innerText = "Pause");
 
-const handleMute = (e) => {};
+const handleMute = (e) => {
+  if (video.muted) {
+    video.muted = false;
+  } else {
+    video.muted = true;
+  }
+  muteBtn.innerText = video.muted ? "Unmute" : "mute";
+};
 
-play.addEventListener("click", handleplay);
-mute.addEventListener("click", handleMute);
+playBtn.addEventListener("click", handlePlayClick);
+muteBtn.addEventListener("click", handleMute);
+video.addEventListener("pause", handlePause);
+video.addEventListener("play", handlePlay);
