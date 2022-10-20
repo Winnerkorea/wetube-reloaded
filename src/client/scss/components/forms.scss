@@ -9,7 +9,7 @@ form {
   }
 }
 
-input {
+input:not(input[type="range"]) {
   all: unset;
   padding: 15px 20px;
   border-radius: 5px;
@@ -33,10 +33,4 @@ input[type="submit"],
   text-align: center;
   cursor: pointer;
   display: block;
-}
-
-input:not(input[type="range"]) {
-  all: unset;
-  padding: 15px 20px;
-  border-radius: 5px;
 }
