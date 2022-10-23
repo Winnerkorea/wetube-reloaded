@@ -19,6 +19,7 @@ app.use(logger);
 // console.log(process.env.DB_URL);
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(
   session({
